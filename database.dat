@@ -1,0 +1,62 @@
+create table `Users`(
+    `name` varchar(128),
+    `email_id` varchar(128),
+    `password` BINARY(32),
+    `address` varchar(512),
+    `city` varchar(32),
+    `state` varchar(32),
+    `pin_code` varchar(10),
+    `contact_no` varchar(20),
+    `dob` date,
+    `google_pay_no` varchar(20),
+    `upi_id` varchar(128),
+    `status` varchar(10),
+    `time_stamp` date default CURDATE(),
+    `admin_seen_time_stamp` date default NULL,
+    primary key(`email_id`)
+);
+
+
+
+
+create table `Companies`(
+    `company_name` varchar(128),
+    `company_logo_path` varchar(128),
+    primary key(`company_name`)
+);
+
+
+
+
+create table `Products`(
+    `company_name` varchar(128),
+    `product_name` varchar(128),
+    `product_type` varchar(128),
+    `product_price` float(16,2),
+    `product_main_cat` varchar(128),
+    `product_sub_cat` varchar(128),
+    `product_description` varchar(128), 
+     primary key(`company_name`,`product_name`,`product_type`),
+    foreign key(`company_name`) references `Companies`(`company_name`) on delete cascade on update cascade
+);
+
+
+create table `Types`(
+    `company_name` varchar(128),
+    `product_name` varchar(128),
+    `product_type` varchar(128),
+    `product_type_des` varchar(128),
+    `product_qty` int(32),
+    primary key(`company_name`,`product_name`,`product_type`,`product_type_des`),
+   foreign key(`company_name`,`product_name`,`product_type`) references `Products`(`company_name`,`product_name`,`product_type`) on delete cascade on update cascade
+);
+
+create table `product_imgs`(
+    `sr_no` int(16) primary key auto_increment, 
+    `company_name` varchar(128),
+     `product_name` varchar(128),
+    `product_type` varchar(128),
+    `imgs` varchar(128),
+    foreign key(`company_name`,`product_name`,`product_type`) references `Products`(`company_name`,`product_name`,`product_type`) on delete cascade on update cascade
+);
+	
