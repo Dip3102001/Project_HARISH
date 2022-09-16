@@ -4,10 +4,40 @@ const con = require('./db');
 const path = require('path');
 const cors = require('cors');
 const url = require('url');
+
 const app = express();
 
 
 const static = path.join(__dirname,'public');
+
+const multer = require('multer');
+
+const stroage = multer.diskStorage({
+    destination : function(req,file,cb){
+        cb(null,'./public/asset/products');
+    },
+    filename : function(req,file,cb){
+        
+        const filename = Date.now()+file.originalname;
+        cb(null,filename);
+        
+
+        const company_name = req.body.company_name;
+        const product_name = req.body.product_name;
+        const product_type =req.body.product_type;
+        const sql = `
+            INSERT INTO product_imgs(company_name,product_name,product_type,imgs) values('${company_name}','${product_name}','${product_type}','${filename}')
+        
+        `;
+
+        con.query(sql,(err,result)=>{
+            if(err) console.log(err);
+            else console.log("changes made to database..");
+        });
+    }
+});
+
+const upload = multer({storage:stroage});
 
 
 app.use(express.static(path.join(__dirname,'public','Client')));
@@ -38,7 +68,7 @@ app.get('/company',(req,res)=>{
 
 
 // to add product in Product table in experiment db
-app.post('/add_product',(req,res)=>{
+app.post('/add_product',upload.any('product_images'),(req,res)=>{
     const company_name = req.body.company_name;
     const product_name = req.body.company_name;
     const product_type = req.body.product_type;
@@ -48,7 +78,11 @@ app.post('/add_product',(req,res)=>{
     const product_sub_cat = req.body.product_sub_cat;
     const product_des = req.body.product_description;
 
-    const sql = `insert into Product(company_name,product_name,product_type,product_price,product_main_cat,product_sub_cat,product_description) values(${company_name},${product_name},${product_type},${product_price},${product_main_cat},${product_sub_cat},${product_des})`;
+    const sql = `insert into Products(company_name,product_name,product_type,product_price,product_main_cat,product_sub_cat,product_description) values(${company_name},${product_name},${product_type},${product_price},${product_main_cat},${product_sub_cat},${product_des})`;
+
+
+    
+
 
     con.query(sql,(err,result)=>{
         if(err) console.log(err);
